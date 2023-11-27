@@ -7,6 +7,8 @@ using System.Net.Http;
 using BepInEx;
 using HarmonyLib;
 using BepInEx.Configuration;
+using System.Net;
+using System.Security.Policy;
 
 namespace LethalShock
 {
@@ -38,7 +40,11 @@ namespace LethalShock
             CustomConfigFile.Bind<string>("SHARECODE", "Code", "17519CD8GAP", (ConfigDescription)null);
             harmony.PatchAll(typeof(LethalShockBase));
 
-
         }
+    }
+
+    public class PiShockAPI : HttpClient //Our client that will be contacting PiShock API servers
+    {
+
     }
 }
