@@ -26,6 +26,7 @@ namespace LethalShock
             {
                 Instance = this;
             }
+            harmony.PatchAll(typeof(LethalShockBase));
         }
     }
 }
