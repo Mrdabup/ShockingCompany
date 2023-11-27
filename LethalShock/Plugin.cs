@@ -24,7 +24,7 @@ namespace LethalShock
 
         private static LethalShockBase Instance;
 
-        private const string piName = "Lethal_Shock_CMD";
+        private const string Name = "Lethal_Shock_CMD"; //Name for the bot that shows up in logs
 
         internal static ConfigFile CustomConfigFile { get; set; }
 
@@ -41,10 +41,5 @@ namespace LethalShock
             harmony.PatchAll(typeof(LethalShockBase));
 
         }
-    }
-
-    public class PiShockAPI : HttpClient //Our client that will be contacting PiShock API servers
-    {
-
     }
 }
