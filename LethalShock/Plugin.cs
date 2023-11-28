@@ -40,7 +40,7 @@ namespace LethalShock
             ApiKey = Config.Bind("Settings", "ApiKey", "5c678926-d19e-4f86-42ad-21f5a76126db", "Your API key");
             Code = Config.Bind("Settings", "Code", "17519CD8GAP", "Your share code");
 
-            ShockerMode = 0; //0 is Shock 1 is Vibrate 3 is Beep
+            ShockerMode = 0; //0 is Shock 1 is Vibrate 2 is Beep
             Intensity = 100; //placeholder numbers, Has to be between 1 and 100
             Duration = 5; //placeholder numbers, Has to be between 1 and 15
             
