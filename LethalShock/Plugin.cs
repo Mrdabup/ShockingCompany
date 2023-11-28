@@ -9,6 +9,7 @@ using HarmonyLib;
 using BepInEx.Configuration;
 using System.Net;
 using System.Security.Policy;
+using LethalShock.Patches;
 
 namespace LethalShock
 {
@@ -39,7 +40,8 @@ namespace LethalShock
             CustomConfigFile.Bind<string>("API", "ApiKey", "5c678926-d19e-4f86-42ad-21f5a76126db", (ConfigDescription)null);
             CustomConfigFile.Bind<string>("SHARECODE", "Code", "17519CD8GAP", (ConfigDescription)null);
             harmony.PatchAll(typeof(LethalShockBase));
-
+            harmony.PatchAll(typeof(CheckPlayer));
+            Logger.LogInfo("If you see this, hello!");
         }
     }
 }
