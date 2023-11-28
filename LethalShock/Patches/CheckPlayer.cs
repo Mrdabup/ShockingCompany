@@ -16,13 +16,7 @@ namespace LethalShock.Patches
         [HarmonyPostfix]
         static void healthCheck(ref int ___health)
         {
-            if (___health < 99)
-            {
-                ___health = 999;
-            }
-            else
-            {
-            }
+
         }
     }
 }
