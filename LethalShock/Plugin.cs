@@ -97,9 +97,14 @@ namespace LethalShock
             private static int previousHealth = -1;
             private static int frameCounter = 0;
 
+            private static void healthCheck(PlayerControllerB __instance, ref int ___health)
+            {
+                healthCheck(__instance, ref ___health, LethalShockBase);
+            }
+
             [HarmonyPatch("Update")]
             [HarmonyPostfix]
-            static void healthCheck(PlayerControllerB __instance, ref int ___health)
+            static void healthCheck(PlayerControllerB __instance, ref int ___health, LethalShockBase lethalShockBase)
             {
                 // Assuming __instance.gameObject is the player GameObject
                 NetworkObject networkObject = __instance.gameObject.GetComponent<NetworkObject>();
@@ -111,7 +116,7 @@ namespace LethalShock
                     if (frameCounter % 2 == 0)
                     {
                         int healthDifference = ___health - previousHealth;
-
+                           
                         Logger.LogInfo($"Current Health: {___health}, Previous Health: {previousHealth}, Health Difference: {healthDifference}");
 
                         if (healthDifference != 0)
@@ -119,6 +124,10 @@ namespace LethalShock
                             // Use healthDifference as the shock intensity and call the API here
                             Instance.Intensity = healthDifference;
                             // Instance.CallApiAsync(); Do not uncomment until you are sure its only calling this once then going back idle!!! you will dos the api
+                        }
+                        if(healthDifference > 2)
+                        {
+                            lethalShockBase.CallApiAsync();
                         }
                     }
 
