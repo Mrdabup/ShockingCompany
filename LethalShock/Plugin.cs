@@ -104,7 +104,7 @@ namespace LethalShock
 
             [HarmonyPatch("Update")]
             [HarmonyPostfix]
-            static void healthCheck(PlayerControllerB __instance, ref int ___health, LethalShockBase lethalShockBase)
+            static void healthCheck(PlayerControllerB __instance, ref int ___health)
             {
                 // Assuming __instance.gameObject is the player GameObject
                 NetworkObject networkObject = __instance.gameObject.GetComponent<NetworkObject>();
@@ -127,7 +127,7 @@ namespace LethalShock
                         }
                         if(healthDifference > 2)
                         {
-                            lethalShockBase.CallApiAsync();
+                            Logger.LogMessage("User shocked");
                         }
                     }
 
