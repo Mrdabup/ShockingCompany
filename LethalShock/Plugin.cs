@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
+using GameNetcodeStuff;
 
 namespace LethalShock
 {
@@ -59,7 +60,7 @@ namespace LethalShock
             CallApiAsync();
         }
 
-        public async Task CallApiAsync()
+        private async Task CallApiAsync()
         {
             using (HttpClient client = new HttpClient())
             {
@@ -77,7 +78,7 @@ namespace LethalShock
                     // Check if the request was successful 
                     if (response.IsSuccessStatusCode)
                     {
-                        Logger.LogInfo($"API call successful{response.StatusCode}");
+                        Logger.LogInfo("API call successful");
                     }
                     else
                     {
@@ -88,6 +89,16 @@ namespace LethalShock
                 {
                     Logger.LogError($"Error: {ex.Message}");
                 }
+            }
+        }
+        [HarmonyPatch(typeof(PlayerControllerB))]
+        internal class CheckPlayer
+        {
+            [HarmonyPatch("Update")]
+            [HarmonyPostfix]
+            static void healthCheck(ref int ___health)
+            {
+
             }
         }
     }
