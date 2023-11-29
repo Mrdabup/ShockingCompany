@@ -49,6 +49,9 @@ namespace LethalShock
             // harmony.PatchAll(typeof(CheckPlayer));
             Logger.LogInfo("If you see this, hello!");
 
+            Logger.LogInfo(Username);
+            Logger.LogInfo(ApiKey);
+            Logger.LogInfo(Code);
             
             CallApiAsync();
         }
@@ -58,10 +61,10 @@ namespace LethalShock
             using (HttpClient client = new HttpClient())
             {
                 // Prepare the JSON payload
-                string jsonPayload = $"{{\"Username\":\"{Username.Value}\",\"Name\":\"{name}\",\"Code\":\"{Code.Value}\",\"Intensity\":\"{Intensity},\"Duration\":\"{Duration}\",\"Apikey\":\"{ApiKey.Value}\",\"Op\":\"{ShockerMode}\"}}";
+                string jsonPayload = $"{{\"Username\":\"{Username}\",\"Name\":\"{name}\",\"Code\":\"{Code}\",\"Intensity\":\"{Intensity},\"Duration\":\"{Duration}\",\"Apikey\":\"{ApiKey}\",\"Op\":\"{ShockerMode}\"}}";
 
                 // Create a StringContent with the JSON payload and set content type
-                StringContent content = new StringContent(jsonPayload, Encoding.UTF32, "application/json");
+                StringContent content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
                 try
                 {
