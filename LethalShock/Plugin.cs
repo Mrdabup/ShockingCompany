@@ -72,12 +72,12 @@ namespace LethalShock
 
                 try
                 {
-                    HttpResponseMessage response =
-                        await client.PostAsync("https://do.pishock.com/api/apioperate", content);
+                    HttpResponseMessage response = await client.PostAsync("https://do.pishock.com/api/apioperate", content);
 
                     if (response.IsSuccessStatusCode)
                     {
-                        Logger.LogInfo("API call successful");
+                        string responseBody = await response.Content.ReadAsStringAsync();
+                        Logger.LogInfo($"API call successful. Response: {responseBody}");
                     }
                     else
                     {
