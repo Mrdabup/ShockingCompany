@@ -28,17 +28,20 @@ namespace LethalShock
         private static ConfigEntry<string> ApiKey;
         private static ConfigEntry<string> Code;
 
-       private void Awake()
+        internal static new ConfigFile Config { get; set; }
+
+        private void Awake()
         {
             if (Instance == null)
             {
                 Instance = this;
             }
-            
+
             // Bind configuration values using separate ConfigEntry instances
-            Username = Config.Bind("Settings", "Username", "JohnDoe", "Your username");
-            ApiKey = Config.Bind("Settings", "ApiKey", "5c678926-d19e-4f86-42ad-21f5a76126db", "Your API key");
-            Code = Config.Bind("Settings", "Code", "17519CD8GAP", "Your share code");
+            Config = new ConfigFile(Paths.ConfigPath + "\\MrdTika.LethalShock.cfg", true);
+            Username = Config.Bind<string>("Settings", "Username", "JohnDoe", "Your username");
+            ApiKey = Config.Bind<string>("Settings", "ApiKey", "5c678926-d19e-4f86-42ad-21f5a76126db", "Your API key");
+            Code = Config.Bind<string>("Settings", "Code", "17519CD8GAP", "Your share code");
 
             ShockerMode = 0; //0 is Shock 1 is Vibrate 2 is Beep
             Intensity = 100; //placeholder numbers, Has to be between 1 and 100
@@ -49,9 +52,9 @@ namespace LethalShock
             // harmony.PatchAll(typeof(CheckPlayer));
             Logger.LogInfo("If you see this, hello!");
 
-            Logger.LogInfo(Username);
-            Logger.LogInfo(ApiKey);
-            Logger.LogInfo(Code);
+            Logger.LogInfo(Username.Value);
+            Logger.LogInfo(ApiKey.Value);
+            Logger.LogInfo(Code.Value);
             
             CallApiAsync();
         }
@@ -61,7 +64,7 @@ namespace LethalShock
             using (HttpClient client = new HttpClient())
             {
                 // Prepare the JSON payload
-                string jsonPayload = $"{{\"Username\":\"{Username}\",\"Name\":\"{name}\",\"Code\":\"{Code}\",\"Intensity\":\"{Intensity},\"Duration\":\"{Duration}\",\"Apikey\":\"{ApiKey}\",\"Op\":\"{ShockerMode}\"}}";
+                string jsonPayload = $"{{\"Username\":\"{Username.Value}\",\"Name\":\"{Name}\",\"Code\":\"{Code.Value}\",\"Intensity\":\"{Intensity},\"Duration\":\"{Duration}\",\"Apikey\":\"{ApiKey.Value}\",\"Op\":\"{ShockerMode}\"}}";
 
                 // Create a StringContent with the JSON payload and set content type
                 StringContent content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
