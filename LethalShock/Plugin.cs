@@ -50,7 +50,7 @@ namespace LethalShock
             Logger.LogInfo("If you see this, hello!");
 
             
-            //CallApiAsync().Wait();
+            CallApiAsync();
         }
 
         private async Task CallApiAsync()
@@ -61,7 +61,7 @@ namespace LethalShock
                 string jsonPayload = $"{{\"Username\":\"{Username.Value}\",\"Name\":\"{name}\",\"Code\":\"{Code.Value}\",\"Intensity\":\"{Intensity},\"Duration\":\"{Duration}\",\"Apikey\":\"{ApiKey.Value}\",\"Op\":\"{ShockerMode}\"}}";
 
                 // Create a StringContent with the JSON payload and set content type
-                StringContent content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+                StringContent content = new StringContent(jsonPayload, Encoding.UTF32, "application/json");
 
                 try
                 {
@@ -76,7 +76,7 @@ namespace LethalShock
                     }
                     else
                     {
-                        Logger.LogError($"API call failed with status code: {response.StatusCode}");
+                        Logger.LogError($"API call failed call failed with status code: {response.StatusCode}");
                     }
                 }
                 catch (Exception ex)
