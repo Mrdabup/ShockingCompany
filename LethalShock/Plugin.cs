@@ -59,7 +59,7 @@ namespace LethalShock
             Logger.LogInfo(ApiKey.Value);
             Logger.LogInfo(Code.Value);
 
-            CallApiAsync();
+            //CallApiAsync();
         }
 
         private async Task CallApiAsync()
