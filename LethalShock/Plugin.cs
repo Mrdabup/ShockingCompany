@@ -59,7 +59,7 @@ namespace LethalShock
             Logger.LogInfo(ApiKey.Value);
             Logger.LogInfo(Code.Value);
 
-            //CallApiAsync();
+            CallApiAsync();
         }
 
         private async Task CallApiAsync()
@@ -97,11 +97,6 @@ namespace LethalShock
             private static int previousHealth = -1;
             private static int frameCounter = 0;
 
-            private static void healthCheck(PlayerControllerB __instance, ref int ___health)
-            {
-                healthCheck(__instance, ref ___health);
-            }
-
             [HarmonyPatch("Update")]
             [HarmonyPostfix]
             static void healthCheck(PlayerControllerB __instance, ref int ___health)
@@ -116,7 +111,7 @@ namespace LethalShock
                     if (frameCounter % 2 == 0)
                     {
                         int healthDifference = ___health - previousHealth;
-                           
+
                         Logger.LogInfo($"Current Health: {___health}, Previous Health: {previousHealth}, Health Difference: {healthDifference}");
 
                         if (healthDifference != 0)
@@ -124,10 +119,6 @@ namespace LethalShock
                             // Use healthDifference as the shock intensity and call the API here
                             Instance.Intensity = healthDifference;
                             // Instance.CallApiAsync(); Do not uncomment until you are sure its only calling this once then going back idle!!! you will dos the api
-                        }
-                        if(healthDifference > 2)
-                        {
-                            Logger.LogMessage("User shocked");
                         }
                     }
 
