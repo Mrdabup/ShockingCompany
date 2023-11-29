@@ -59,7 +59,7 @@ namespace LethalShock
             CallApiAsync();
         }
 
-        private async Task CallApiAsync()
+        public async Task CallApiAsync()
         {
             using (HttpClient client = new HttpClient())
             {
@@ -77,7 +77,7 @@ namespace LethalShock
                     // Check if the request was successful 
                     if (response.IsSuccessStatusCode)
                     {
-                        Logger.LogInfo("API call successful");
+                        Logger.LogInfo($"API call successful{response.StatusCode}");
                     }
                     else
                     {
@@ -90,6 +90,5 @@ namespace LethalShock
                 }
             }
         }
-
     }
 }
