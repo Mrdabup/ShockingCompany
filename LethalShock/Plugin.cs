@@ -63,8 +63,8 @@ namespace LethalShock
         {
             using (HttpClient client = new HttpClient())
             {
-                // Prepare the JSON payload
-                string jsonPayload = $"{{\"Username\":\"{Username.Value}\",\"Name\":\"{Name}\",\"Code\":\"{Code.Value}\",\"Intensity\":\"{Intensity},\"Duration\":\"{Duration}\",\"Apikey\":\"{ApiKey.Value}\",\"Op\":\"{ShockerMode}\"}}";
+                // Prepare the JSON payload using configured values
+                string jsonPayload = $"{{\"Username\":\"{Username.Value}\",\"Name\":\"{Name}\",\"Code\":\"{Code.Value}\",\"Intensity\":\"{Intensity}\",\"Duration\":\"{Duration}\",\"Apikey\":\"{ApiKey.Value}\",\"Op\":\"{ShockerMode}\"}}";
 
                 // Create a StringContent with the JSON payload and set content type
                 StringContent content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
@@ -78,11 +78,10 @@ namespace LethalShock
                     if (response.IsSuccessStatusCode)
                     {
                         Logger.LogInfo("API call successful");
-                       
                     }
                     else
                     {
-                        Logger.LogError($"API call failed call failed with status code: {response.StatusCode}");
+                        Logger.LogError($"API call failed with status code: {response.StatusCode}");
                     }
                 }
                 catch (Exception ex)
@@ -91,5 +90,6 @@ namespace LethalShock
                 }
             }
         }
+
     }
 }
