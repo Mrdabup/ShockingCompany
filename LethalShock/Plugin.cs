@@ -2,6 +2,7 @@
 using BepInEx.Configuration;
 using HarmonyLib;
 using UnityEngine;
+using Unity.Netcode;
 using System;
 using System.Net.Http;
 using System.Net.NetworkInformation;
@@ -17,46 +18,47 @@ namespace LethalShock
         private const string modGUID = "MrdTika.LethalShock";
         private const string modName = "Lethal Shock";
         private const string modVersion = "0.0.1";
-    
+
         private readonly Harmony harmony = new Harmony(modGUID);
         private static LethalShockBase Instance;
         private const string Name = "Lethal_Shock_CMD";
-        
-        private int ShockerMode;
-        private int Intensity;
-        private  int Duration;
+
+        public int ShockerMode;
+        public int Intensity;
+        public int Duration;
         private static ConfigEntry<string> Username;
         private static ConfigEntry<string> ApiKey;
         private static ConfigEntry<string> Code;
 
         internal static new ConfigFile Config { get; set; }
+        public static BepInEx.Logging.ManualLogSource Logger { get; private set; }
+        private int previousHealth = -1;
 
         private void Awake()
         {
             if (Instance == null)
             {
                 Instance = this;
+                Logger = base.Logger;
             }
 
-            // Bind configuration values using separate ConfigEntry instances
             Config = new ConfigFile(Paths.ConfigPath + "\\MrdTika.LethalShock.cfg", true);
             Username = Config.Bind<string>("Settings", "Username", "JohnDoe", "Your username");
             ApiKey = Config.Bind<string>("Settings", "ApiKey", "5c678926-d19e-4f86-42ad-21f5a76126db", "Your API key");
             Code = Config.Bind<string>("Settings", "Code", "17519CD8GAP", "Your share code");
 
-            ShockerMode = 0; //0 is Shock 1 is Vibrate 2 is Beep
-            Intensity = 100; //placeholder numbers, Has to be between 1 and 100
-            Duration = 5; //placeholder numbers, Has to be between 1 and 15
-            
+            ShockerMode = 0; // 0 is Shock, 1 is Vibrate, 2 is Beep
+            Intensity = 100; // Placeholder numbers, Has to be between 1 and 100
+            Duration = 5; // Placeholder numbers, Has to be between 1 and 15
+
             harmony.PatchAll(typeof(LethalShockBase));
-            // Commenting the line below assuming CheckPlayer is not defined in this script.
-            // harmony.PatchAll(typeof(CheckPlayer));
+            harmony.PatchAll(typeof(CheckPlayer));
             Logger.LogInfo("If you see this, hello!");
 
             Logger.LogInfo(Username.Value);
             Logger.LogInfo(ApiKey.Value);
             Logger.LogInfo(Code.Value);
-            
+
             CallApiAsync();
         }
 
@@ -64,18 +66,15 @@ namespace LethalShock
         {
             using (HttpClient client = new HttpClient())
             {
-                // Prepare the JSON payload using configured values
-                string jsonPayload = $"{{\"Username\":\"{Username.Value}\",\"Name\":\"{Name}\",\"Code\":\"{Code.Value}\",\"Intensity\":\"{Intensity}\",\"Duration\":\"{Duration}\",\"Apikey\":\"{ApiKey.Value}\",\"Op\":\"{ShockerMode}\"}}";
-
-                // Create a StringContent with the JSON payload and set content type
+                string jsonPayload =
+                    $"{{\"Username\":\"{Username.Value}\",\"Name\":\"{Name}\",\"Code\":\"{Code.Value}\",\"Intensity\":\"{Intensity}\",\"Duration\":\"{Duration}\",\"Apikey\":\"{ApiKey.Value}\",\"Op\":\"{ShockerMode}\"}}";
                 StringContent content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
                 try
                 {
-                    // Send the POST request
-                    HttpResponseMessage response = await client.PostAsync("https://do.pishock.com/api/apioperate", content);
+                    HttpResponseMessage response =
+                        await client.PostAsync("https://do.pishock.com/api/apioperate", content);
 
-                    // Check if the request was successful 
                     if (response.IsSuccessStatusCode)
                     {
                         Logger.LogInfo("API call successful");
@@ -91,15 +90,44 @@ namespace LethalShock
                 }
             }
         }
+
         [HarmonyPatch(typeof(PlayerControllerB))]
         internal class CheckPlayer
         {
+            private static int previousHealth = -1;
+            private static int frameCounter = 0;
+
             [HarmonyPatch("Update")]
             [HarmonyPostfix]
-            static void healthCheck(ref int ___health)
+            static void healthCheck(PlayerControllerB __instance, ref int ___health)
             {
+                // Assuming __instance.gameObject is the player GameObject
+                NetworkObject networkObject = __instance.gameObject.GetComponent<NetworkObject>();
 
+                if (networkObject != null && networkObject.IsOwner)
+                {
+                    frameCounter++;
+
+                    if (frameCounter % 2 == 0)
+                    {
+                        int healthDifference = ___health - previousHealth;
+
+                        Logger.LogInfo($"Current Health: {___health}, Previous Health: {previousHealth}, Health Difference: {healthDifference}");
+
+                        if (healthDifference != 0)
+                        {
+                            // Use healthDifference as the shock intensity and call the API here
+                            Instance.Intensity = healthDifference;
+                           // Instance.CallApiAsync(); Do not uncomment until you are sure its only calling this once then going back idle!!! you will dos the api
+                        }
+                    }
+
+                    previousHealth = ___health; // Update previous health for the instance
+                }
             }
         }
+
+
+
     }
 }
