@@ -118,7 +118,7 @@ namespace LethalShock
                         {
                             // Use healthDifference as the shock intensity and call the API here
                             Instance.Intensity = healthDifference;
-                           // Instance.CallApiAsync(); Do not uncomment until you are sure its only calling this once then going back idle!!! you will dos the api
+                            // Instance.CallApiAsync(); Do not uncomment until you are sure its only calling this once then going back idle!!! you will dos the api
                         }
                     }
 
