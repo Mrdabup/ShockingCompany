@@ -99,7 +99,7 @@ namespace LethalShock
 
             private static void healthCheck(PlayerControllerB __instance, ref int ___health)
             {
-                healthCheck(__instance, ref ___health, LethalShockBase);
+                healthCheck(__instance, ref ___health);
             }
 
             [HarmonyPatch("Update")]
