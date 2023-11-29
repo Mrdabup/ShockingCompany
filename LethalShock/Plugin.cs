@@ -59,20 +59,21 @@ namespace LethalShock
             Logger.LogInfo(ApiKey.Value);
             Logger.LogInfo(Code.Value);
 
-            CallApiAsync();
+            CallApiAsync(100,1,0);
         }
 
-        private async Task CallApiAsync()
+        private async Task CallApiAsync(int intensity, int duration, int mode)
         {
             using (HttpClient client = new HttpClient())
             {
                 string jsonPayload =
-                    $"{{\"Username\":\"{Username.Value}\",\"Name\":\"{Name}\",\"Code\":\"{Code.Value}\",\"Intensity\":\"{Intensity}\",\"Duration\":\"{Duration}\",\"Apikey\":\"{ApiKey.Value}\",\"Op\":\"{ShockerMode}\"}}";
+                    $"{{\"Username\":\"{Username.Value}\",\"Name\":\"{Name}\",\"Code\":\"{Code.Value}\",\"Intensity\":\"{intensity}\",\"Duration\":\"{duration}\",\"Apikey\":\"{ApiKey.Value}\",\"Op\":\"{mode}\"}}";
                 StringContent content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
                 try
                 {
-                    HttpResponseMessage response = await client.PostAsync("https://do.pishock.com/api/apioperate", content);
+                    HttpResponseMessage response =
+                        await client.PostAsync("https://do.pishock.com/api/apioperate", content);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -101,7 +102,12 @@ namespace LethalShock
             [HarmonyPostfix]
             static void healthCheck(PlayerControllerB __instance, ref int ___health)
             {
-                // Assuming __instance.gameObject is the player GameObject
+                // Check if the GameObject is a child of PlayersContainer
+                if (IsChildOfPlayersContainer(__instance.gameObject))
+                {
+                    return; // Skip processing for instances in PlayersContainer
+                }
+
                 NetworkObject networkObject = __instance.gameObject.GetComponent<NetworkObject>();
 
                 if (networkObject != null && networkObject.IsOwner)
@@ -112,22 +118,38 @@ namespace LethalShock
                     {
                         int healthDifference = ___health - previousHealth;
 
-                        Logger.LogInfo($"Current Health: {___health}, Previous Health: {previousHealth}, Health Difference: {healthDifference}");
+                        Logger.LogInfo(
+                            $"Current Health: {___health}, Previous Health: {previousHealth}, Health Difference: {healthDifference}");
 
                         if (healthDifference != 0)
                         {
                             // Use healthDifference as the shock intensity and call the API here
                             Instance.Intensity = healthDifference;
-                            // Instance.CallApiAsync(); Do not uncomment until you are sure its only calling this once then going back idle!!! you will dos the api
+                            // Instance.CallApiAsync(1,1,0); Do not uncomment until you are sure its only calling this once then going back idle!!! you will dos the api
                         }
                     }
 
                     previousHealth = ___health; // Update previous health for the instance
                 }
             }
+
+            // Helper method to check if the GameObject is a child of PlayersContainer
+            static bool IsChildOfPlayersContainer(GameObject gameObject)
+            {
+                // Change "PlayersContainer" to the actual name of your PlayersContainer GameObject
+                Transform parent = gameObject.transform.parent;
+                while (parent != null)
+                {
+                    if (parent.name == "PlayersContainer")
+                    {
+                        return true; // Found PlayersContainer in the hierarchy
+                    }
+
+                    parent = parent.parent;
+                }
+
+                return false; // PlayersContainer not found in the hierarchy
+            }
         }
-
-
-
     }
 }
