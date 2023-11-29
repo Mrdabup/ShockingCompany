@@ -91,15 +91,5 @@ namespace LethalShock
                 }
             }
         }
-        [HarmonyPatch(typeof(PlayerControllerB))]
-        internal class CheckPlayer
-        {
-            [HarmonyPatch("Update")]
-            [HarmonyPostfix]
-            static void healthCheck(ref int ___health)
-            {
-
-            }
-        }
     }
 }

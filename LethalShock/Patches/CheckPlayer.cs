@@ -9,7 +9,7 @@ namespace LethalShock.Patches
         private static int previousHealth;
         
         // Assuming you have an instance of YourPluginClass available
-
+        
 
         [HarmonyPatch("Update")]
         [HarmonyPostfix]
