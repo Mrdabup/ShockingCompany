@@ -31,10 +31,10 @@ namespace LethalShock
         private static ConfigEntry<string> Code;
 
         internal static new ConfigFile Config { get; set; }
-        public static BepInEx.Logging.ManualLogSource Logger { get; private set; }
+        public new static BepInEx.Logging.ManualLogSource Logger { get; private set; }
         private int previousHealth = -1;
 
-        private void Awake()
+        private async void Awake()
         {
             if (Instance == null)
             {
@@ -59,7 +59,7 @@ namespace LethalShock
             Logger.LogInfo(ApiKey.Value);
             Logger.LogInfo(Code.Value);
 
-            CallApiAsync(100,1,0);
+            await CallApiAsync(100, 1, 0);
         }
 
         private async Task CallApiAsync(int intensity, int duration, int mode)
@@ -95,12 +95,9 @@ namespace LethalShock
         [HarmonyPatch(typeof(PlayerControllerB))]
         internal class CheckPlayer
         {
-            private static int previousHealth = -1;
-            private static int frameCounter = 0;
-
-            [HarmonyPatch("Update")]
             [HarmonyPostfix]
-            static void healthCheck(PlayerControllerB __instance, ref int ___health)
+            [HarmonyPatch("DamagePlayer")]
+            static void DamagePlayerPostfix(PlayerControllerB __instance, int damageNumber)
             {
                 // Check if the GameObject is a child of PlayersContainer
                 if (IsChildOfPlayersContainer(__instance.gameObject))
@@ -112,26 +109,34 @@ namespace LethalShock
 
                 if (networkObject != null && networkObject.IsOwner)
                 {
-                    frameCounter++;
+                    int currentHealth = __instance.health;
 
-                    if (frameCounter % 2 == 0)
+                    Logger.LogInfo($"player's health after taking {damageNumber} damage: {currentHealth}");
+
+                    int healthDifference = currentHealth - Instance.previousHealth;
+
+                    Logger.LogInfo($"Health Difference: {healthDifference}");
+
+                    if (healthDifference != 0 || Instance.previousHealth == -1)
                     {
-                        int healthDifference = ___health - previousHealth;
+                        // Use healthDifference as the shock intensity and call the API here
+                        Instance.Intensity = healthDifference;
 
-                        Logger.LogInfo(
-                            $"Current Health: {___health}, Previous Health: {previousHealth}, Health Difference: {healthDifference}");
-
-                        if (healthDifference != 0)
+                        try
                         {
-                            // Use healthDifference as the shock intensity and call the API here
-                            Instance.Intensity = healthDifference;
-                            // Instance.CallApiAsync(1,1,0); Do not uncomment until you are sure its only calling this once then going back idle!!! you will dos the api
+                            // Instance.CallApiAsync(1, 1, 0); // Uncomment when ready to call the API
+                            Logger.LogInfo("Player Zapped");
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.LogError($"Error in CallApiAsync: {ex.Message}");
                         }
                     }
 
-                    previousHealth = ___health; // Update previous health for the instance
+                    Instance.previousHealth = currentHealth; // Update previous health for the instance
                 }
             }
+
 
             // Helper method to check if the GameObject is a child of PlayersContainer
             static bool IsChildOfPlayersContainer(GameObject gameObject)
@@ -151,5 +156,7 @@ namespace LethalShock
                 return false; // PlayersContainer not found in the hierarchy
             }
         }
+
+
     }
 }
