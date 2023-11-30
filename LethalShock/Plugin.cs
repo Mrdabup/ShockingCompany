@@ -53,6 +53,13 @@ namespace LethalShock
 
             harmony.PatchAll(typeof(LethalShockBase));
             harmony.PatchAll(typeof(CheckPlayer));
+
+            // Log when attaching to a player object
+            Logger.LogInfo("Mod attached to a player object. Hierarchy:");
+
+            // Log the hierarchy of the player object
+            LogHierarchy(gameObject);
+
             Logger.LogInfo("If you see this, hello!");
 
             Logger.LogInfo(Username.Value);
@@ -60,6 +67,21 @@ namespace LethalShock
             Logger.LogInfo(Code.Value);
 
             await CallApiAsync(100, 1, 0);
+        }
+
+        private void LogHierarchy(GameObject obj, int depth = 0)
+        {
+            if (obj == null)
+            {
+                return;
+            }
+
+            Logger.LogInfo($"{new string('-', depth)} {obj.name}");
+
+            foreach (Transform child in obj.transform)
+            {
+                LogHierarchy(child.gameObject, depth + 1);
+            }
         }
 
         private async Task CallApiAsync(int intensity, int duration, int mode)
@@ -99,19 +121,11 @@ namespace LethalShock
             [HarmonyPatch("DamagePlayer")]
             static void DamagePlayerPostfix(PlayerControllerB __instance, int damageNumber)
             {
-                // Check if the GameObject is a child of PlayersContainer
-                if (IsChildOfPlayersContainer(__instance.gameObject))
-                {
-                    return; // Skip processing for instances in PlayersContainer
-                }
-
-                NetworkObject networkObject = __instance.gameObject.GetComponent<NetworkObject>();
-
-                if (networkObject != null && networkObject.IsOwner)
+                if (IsPlayerValid(__instance))
                 {
                     int currentHealth = __instance.health;
 
-                    Logger.LogInfo($"player's health after taking {damageNumber} damage: {currentHealth}");
+                    Logger.LogInfo($"Player's health after taking {damageNumber} damage: {currentHealth}");
 
                     int healthDifference = currentHealth - Instance.previousHealth;
 
@@ -119,7 +133,6 @@ namespace LethalShock
 
                     if (healthDifference != 0 || Instance.previousHealth == -1)
                     {
-                        // Use healthDifference as the shock intensity and call the API here
                         Instance.Intensity = healthDifference;
 
                         try
@@ -137,11 +150,23 @@ namespace LethalShock
                 }
             }
 
+            static bool IsPlayerValid(PlayerControllerB player)
+            {
+                // Check if the GameObject is a child of PlayersContainer
+                if (IsChildOfPlayersContainer(player.gameObject))
+                {
+                    return false; // Skip processing for instances in PlayersContainer
+                }
+
+                NetworkObject networkObject = player.gameObject.GetComponent<NetworkObject>();
+
+                // Check if the player has the ownership
+                return networkObject != null && networkObject.IsOwner;
+            }
 
             // Helper method to check if the GameObject is a child of PlayersContainer
             static bool IsChildOfPlayersContainer(GameObject gameObject)
             {
-                // Change "PlayersContainer" to the actual name of your PlayersContainer GameObject
                 Transform parent = gameObject.transform.parent;
                 while (parent != null)
                 {
@@ -156,7 +181,5 @@ namespace LethalShock
                 return false; // PlayersContainer not found in the hierarchy
             }
         }
-
-
     }
 }
