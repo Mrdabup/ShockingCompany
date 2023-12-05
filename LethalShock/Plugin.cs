@@ -60,13 +60,13 @@ namespace LethalShock
             // Log the hierarchy of the player object
             LogHierarchy(gameObject);
 
-            Logger.LogInfo("If you see this, hello!");
+            Logger.LogInfo("Hello there:");
 
             Logger.LogInfo(Username.Value);
-            Logger.LogInfo(ApiKey.Value);
-            Logger.LogInfo(Code.Value);
 
-            await CallApiAsync(100, 1, 0);
+            await CallApiAsync(100, 3, 2); //Goes like this: Intensity, Duration, ShockerMode
+
+            Logger.LogInfo("Please check if it beeped, if not and there is an error check config files.");
         }
 
         private void LogHierarchy(GameObject obj, int depth = 0)
@@ -139,8 +139,8 @@ namespace LethalShock
 
                         try
                         {
-                            // Instance.CallApiAsync(1, 1, 0); // Uncomment when ready to call the API
-                            Logger.LogInfo("Player Zapped");
+                            Instance.CallApiAsync(healthDifference, 1, 0); // Uncomment when ready to call the API
+                            Logger.LogInfo($"Player Zapped with value {healthDifference}");
                         }
                         catch (Exception ex)
                         {
