@@ -124,10 +124,12 @@ namespace LethalShock
                 Logger.LogInfo("If you see this, then that means that Call out of 1/? worked!");
 
                     int currentHealth = __instance.health;
+                    
+                    Instance.previousHealth = 100;
 
                     Logger.LogInfo($"Lol is this our script? {damageNumber} damage: {currentHealth}");
 
-                    int healthDifference = currentHealth - Instance.previousHealth;
+                    int healthDifference = Instance.previousHealth - currentHealth;
 
                     Logger.LogInfo($"Health Difference: {healthDifference}");
 
@@ -145,8 +147,7 @@ namespace LethalShock
                             Logger.LogInfo($"Error in CallApiAsync: {ex.Message}");
                         }
                     }
-
-                    Instance.previousHealth = currentHealth; // Update previous health for the instance
+                Instance.previousHealth = currentHealth; // Update previous health for the instance
             }
 
             static bool IsPlayerValid(PlayerControllerB player)
