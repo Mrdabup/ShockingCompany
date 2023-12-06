@@ -20,3 +20,10 @@ Mrdab nor its contributors are responsible for any harm or misuse of both the Pi
 # BUGS?
 
 Create a github issue *OR* email us at lethalshock@tied.live
+
+# CHANGE LOG
+
+Current Version: 0.1.2
+
+- Fixed calculations for damage in code
+- We'll continue to update this mod for potential bugs
