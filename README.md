@@ -1,5 +1,6 @@
 # LethalShock
 A FOSS project to add PiShock support to Lethal Company
+Not Affiliated with the [LethalShock](https://github.com/RedSpeeds/LethalShock) mod by RedSpeeds 
 
 # Branch Info
 
