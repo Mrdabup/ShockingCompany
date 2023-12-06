@@ -1,6 +1,6 @@
 {
     "name": "LethalShock",
-    "version_number": "0.1.0",
+    "version_number": "0.1.2",
     "website_url": "https://github.com/Mrdabup/LethalShock/",
     "description": "Adds PiShock support",
     "dependencies": [
