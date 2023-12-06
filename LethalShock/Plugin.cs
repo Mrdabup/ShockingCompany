@@ -17,7 +17,9 @@ namespace LethalShock
     {
         private const string modGUID = "MrdTika.LethalShock";
         private const string modName = "Lethal Shock";
-        private const string modVersion = "0.1.0";
+
+        private const string modVersion = "0.2.0";
+
 
         private readonly Harmony harmony = new Harmony(modGUID);
         private static LethalShockBase Instance;
@@ -117,11 +119,15 @@ namespace LethalShock
         [HarmonyPatch(typeof(PlayerControllerB))]
         internal class CheckPlayer
         {
+            private static int storedDamageNumber = 0;
+
             [HarmonyPostfix]
             [HarmonyPatch("DamagePlayer")]
             static void DamagePlayerPostfix(PlayerControllerB __instance, int damageNumber)
             {
                     int currentHealth = __instance.health;
+
+                    storedDamageNumber = damageNumber;
 
                     Logger.LogInfo($"Lol is this our script? {damageNumber} damage: {currentHealth}");
 
@@ -142,6 +148,28 @@ namespace LethalShock
                         }
                     }
                 Instance.previousHealth = currentHealth; // Update previous health for the instance
+            }
+
+            [HarmonyPostfix]
+            [HarmonyPatch("KillPlayer")]
+            static void KillPlayerPostFix(PlayerControllerB __instance)
+            {
+                if(storedDamageNumber != 0 )
+                {
+                    Logger.LogError("Cannot double shock for user safety!");
+                }
+                else
+                {
+                    Logger.LogInfo("Player Killed by Unkown Cause!");
+                    Instance.CallApiAsync(100, 1, 0); // Uncomment when ready to call the API
+                    Logger.LogInfo($"Player Zapped with no mercy, player was killed");
+                }
+                if(storedDamageNumber != 0 || Instance.previousHealth == -1) // If the Damage number is greater than 0 & previousHealth is -1 of that value then execute
+                {
+                    Logger.LogInfo("Player Killed by Unkown Cause!");
+                    Instance.CallApiAsync(100, 1, 0); // Uncomment when ready to call the API
+                    Logger.LogInfo($"Player Zapped with no mercy, player was killed");
+                }
             }
 
             static bool IsPlayerValid(PlayerControllerB player)

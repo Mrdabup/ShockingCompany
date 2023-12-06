@@ -25,7 +25,8 @@ Create a github issue *OR* email us at lethalshock@tied.live
 
 # CHANGE LOG
 
-Current Version: 0.1.2
 
-- Fixed calculations for damage in code
-- We'll continue to update this mod for potential bugs
+NEW ADDITIONS
+
+-Added fully featured shocking API
+
