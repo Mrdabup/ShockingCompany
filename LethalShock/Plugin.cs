@@ -17,7 +17,7 @@ namespace LethalShock
     {
         private const string modGUID = "MrdTika.LethalShock";
         private const string modName = "Lethal Shock";
-        private const string modVersion = "0.1.4";
+        private const string modVersion = "0.2.0";
 
         private readonly Harmony harmony = new Harmony(modGUID);
         private static LethalShockBase Instance;
