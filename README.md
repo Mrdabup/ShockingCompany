@@ -20,3 +20,9 @@ Mrdab nor its contributors are responsible for any harm or misuse of both the Pi
 # BUGS?
 
 Create a github issue *OR* email us at lethalshock@tied.live
+
+# CHANGE LOG
+
+NEW ADDITIONS
+
+-Added fully featured shocking API
