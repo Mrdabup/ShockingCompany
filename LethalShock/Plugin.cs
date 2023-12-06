@@ -125,18 +125,16 @@ namespace LethalShock
 
                     Logger.LogInfo($"Lol is this our script? {damageNumber} damage: {currentHealth}");
 
-                    int healthDifference = Instance.previousHealth - currentHealth;
+                    Logger.LogInfo($"Health Difference: {damageNumber}");
 
-                    Logger.LogInfo($"Health Difference: {healthDifference}");
-
-                    if (healthDifference != 0 || Instance.previousHealth == -1)
+                    if (damageNumber != 0 || Instance.previousHealth == -1)
                     {
-                        Instance.Intensity = healthDifference;
+                        Instance.Intensity = damageNumber;
 
                         try
                         {
-                            Instance.CallApiAsync(healthDifference, 1, 0); // Uncomment when ready to call the API
-                            Logger.LogInfo($"Player Zapped with value {healthDifference}");
+                            Instance.CallApiAsync(damageNumber, 1, 0); // Uncomment when ready to call the API
+                            Logger.LogInfo($"Player Zapped with value {damageNumber}");
                         }
                         catch (Exception ex)
                         {
