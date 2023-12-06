@@ -121,11 +121,7 @@ namespace LethalShock
             [HarmonyPatch("DamagePlayer")]
             static void DamagePlayerPostfix(PlayerControllerB __instance, int damageNumber)
             {
-                Logger.LogInfo("If you see this, then that means that Call out of 1/? worked!");
-
                     int currentHealth = __instance.health;
-                    
-                    Instance.previousHealth = 100;
 
                     Logger.LogInfo($"Lol is this our script? {damageNumber} damage: {currentHealth}");
 
