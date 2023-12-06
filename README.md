@@ -16,3 +16,7 @@ Mrdab nor its contributors are responsible for any harm or misuse of both the Pi
 4. Open the game to generate the config folder (located at '...\steamapps\common\Lethal Company\BepInEx\config')
 5. Close the game and open the config file named 'MrdTika.LethalShock.cfg'
 6. Save the config folder (after adding the username, apikey, and sharecode) and you should be ready to go!
+
+# BUGS?
+
+Create a github issue *OR* email us at lethalshock@tied.live
