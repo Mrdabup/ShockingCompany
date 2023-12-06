@@ -152,11 +152,17 @@ namespace LethalShock
             [HarmonyPatch("KillPlayer")]
             static void KillPlayerPostFix(PlayerControllerB __instance)
             {
-                if(storedDamageNumber != 0)
+                if(storedDamageNumber != 0 )
                 {
                     Logger.LogError("Cannot double shock for user safety!");
                 }
                 else
+                {
+                    Logger.LogInfo("Player Killed by Unkown Cause!");
+                    Instance.CallApiAsync(100, 1, 0); // Uncomment when ready to call the API
+                    Logger.LogInfo($"Player Zapped with no mercy, player was killed");
+                }
+                if(storedDamageNumber != 0 || Instance.previousHealth == -1) // If the Damage number is greater than 0 & previousHealth is -1 of that value then execute
                 {
                     Logger.LogInfo("Player Killed by Unkown Cause!");
                     Instance.CallApiAsync(100, 1, 0); // Uncomment when ready to call the API
