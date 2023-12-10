@@ -1,4 +1,4 @@
-# LethalShock
+# ShockingCompany
 A FOSS project to add PiShock support to Lethal Company
 
 Not Affiliated with the [LethalShock](https://github.com/RedSpeeds/LethalShock) mod by RedSpeeds as the name was chosen before we were aware of that mod existing and prior to it being created   
