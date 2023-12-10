@@ -15,15 +15,15 @@ namespace LethalShock
     [BepInPlugin(modGUID, modName, modVersion)]
     public class LethalShockBase : BaseUnityPlugin
     {
-        private const string modGUID = "MrdTika.LethalShock";
-        private const string modName = "Lethal Shock";
+        private const string modGUID = "MrdTika.ShockingCompany";
+        private const string modName = "ShockingCompany";
 
         private const string modVersion = "0.2.0";
 
 
         private readonly Harmony harmony = new Harmony(modGUID);
         private static LethalShockBase Instance;
-        private const string Name = "Lethal_Shock_CMD";
+        private const string Name = "ShockingCompany_CMD";
 
         public int ShockerMode;
         public int Intensity;
@@ -44,7 +44,7 @@ namespace LethalShock
                 Logger = base.Logger;
             }
 
-            Config = new ConfigFile(Paths.ConfigPath + "\\MrdTika.LethalShock.cfg", true);
+            Config = new ConfigFile(Paths.ConfigPath + "\\ShockingCompany.cfg", true);
             Username = Config.Bind<string>("Settings", "Username", "JohnDoe", "Your username");
             ApiKey = Config.Bind<string>("Settings", "ApiKey", "5c678926-d19e-4f86-42ad-21f5a76126db", "Your API key");
             Code = Config.Bind<string>("Settings", "Code", "17519CD8GAP", "Your share code");
