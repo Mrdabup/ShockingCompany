@@ -88,42 +88,63 @@ namespace LethalShock
             }
         }
 
-        private async Task CallApiAsync(int intensity, int duration, int mode)
+        private async Task CallPiAsync(int intensity, int duration, int mode)
         {
-            if(ShockProvider.Value == "PiShock")
+            using (HttpClient client = new HttpClient())
             {
-                using (HttpClient client = new HttpClient())
+                string jsonPayload =
+                    $"{{\"Username\":\"{Username.Value}\",\"Name\":\"{Name}\",\"Code\":\"{Code.Value}\",\"Intensity\":\"{intensity}\",\"Duration\":\"{duration}\",\"Apikey\":\"{ApiKey.Value}\",\"Op\":\"{mode}\"}}";
+                StringContent content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+
+                try
                 {
-                    string jsonPayload =
-                        $"{{\"Username\":\"{Username.Value}\",\"Name\":\"{Name}\",\"Code\":\"{Code.Value}\",\"Intensity\":\"{intensity}\",\"Duration\":\"{duration}\",\"Apikey\":\"{ApiKey.Value}\",\"Op\":\"{mode}\"}}";
-                    StringContent content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+                    HttpResponseMessage response =
+                        await client.PostAsync("https://do.pishock.com/api/apioperate", content);
 
-                    try
+                    if (response.IsSuccessStatusCode)
                     {
-                        HttpResponseMessage response =
-                            await client.PostAsync("https://do.pishock.com/api/apioperate", content);
-
-                        if (response.IsSuccessStatusCode)
-                        {
-                            string responseBody = await response.Content.ReadAsStringAsync();
-                            Logger.LogInfo($"API call successful. Response: {responseBody}");
-                        }
-                        else
-                        {
-                            Logger.LogError($"API call failed with status code: {response.StatusCode}");
-                        }
+                        string responseBody = await response.Content.ReadAsStringAsync();
+                        Logger.LogInfo($"API call successful. Response: {responseBody}");
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        Logger.LogError($"Error: {ex.Message}");
+                        Logger.LogError($"API call failed with status code: {response.StatusCode}");
                     }
                 }
+                catch (Exception ex)
+                {
+                    Logger.LogError($"Error: {ex.Message}");
+                }
             }
-            else
+        }
+        private async Task CallApiAsync(int intensity, int duration, int mode)
+        {
+            using (HttpClient client = new HttpClient())
             {
-                Logger.LogError("This is the next part of the script!");
+                string jsonPayload =
+                    $"{{\"id\":\"{Username.Value}\",\"type\":\"{Name}\",\"intensity\":\"{Code.Value}\",\"duration\":\"{intensity}\"}}";
+                StringContent content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+
+                try
+                {
+                    HttpResponseMessage response =
+                        await client.PostAsync("https://api.shocklink.net", content);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string responseBody = await response.Content.ReadAsStringAsync();
+                        Logger.LogInfo($"API call successful. Response: {responseBody}");
+                    }
+                    else
+                    {
+                        Logger.LogError($"API call failed with status code: {response.StatusCode}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError($"Error: {ex.Message}");
+                }
             }
-           
         }
 
         [HarmonyPatch(typeof(PlayerControllerB))]
@@ -149,7 +170,7 @@ namespace LethalShock
 
                         try
                         {
-                            Instance.CallApiAsync(damageNumber, 1, 0); // Uncomment when ready to call the API
+                            Instance.CallPiAsync(damageNumber, 1, 0); // Uncomment when ready to call the API
                             Logger.LogInfo($"Player Zapped with value {damageNumber}");
                         }
                         catch (Exception ex)
