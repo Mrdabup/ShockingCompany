@@ -90,32 +90,40 @@ namespace LethalShock
 
         private async Task CallApiAsync(int intensity, int duration, int mode)
         {
-            using (HttpClient client = new HttpClient())
+            if(ShockProvider.Value == "PiShock")
             {
-                string jsonPayload =
-                    $"{{\"Username\":\"{Username.Value}\",\"Name\":\"{Name}\",\"Code\":\"{Code.Value}\",\"Intensity\":\"{intensity}\",\"Duration\":\"{duration}\",\"Apikey\":\"{ApiKey.Value}\",\"Op\":\"{mode}\"}}";
-                StringContent content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
-
-                try
+                using (HttpClient client = new HttpClient())
                 {
-                    HttpResponseMessage response =
-                        await client.PostAsync("https://do.pishock.com/api/apioperate", content);
+                    string jsonPayload =
+                        $"{{\"Username\":\"{Username.Value}\",\"Name\":\"{Name}\",\"Code\":\"{Code.Value}\",\"Intensity\":\"{intensity}\",\"Duration\":\"{duration}\",\"Apikey\":\"{ApiKey.Value}\",\"Op\":\"{mode}\"}}";
+                    StringContent content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
-                    if (response.IsSuccessStatusCode)
+                    try
                     {
-                        string responseBody = await response.Content.ReadAsStringAsync();
-                        Logger.LogInfo($"API call successful. Response: {responseBody}");
+                        HttpResponseMessage response =
+                            await client.PostAsync("https://do.pishock.com/api/apioperate", content);
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            string responseBody = await response.Content.ReadAsStringAsync();
+                            Logger.LogInfo($"API call successful. Response: {responseBody}");
+                        }
+                        else
+                        {
+                            Logger.LogError($"API call failed with status code: {response.StatusCode}");
+                        }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        Logger.LogError($"API call failed with status code: {response.StatusCode}");
+                        Logger.LogError($"Error: {ex.Message}");
                     }
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogError($"Error: {ex.Message}");
                 }
             }
+            else
+            {
+                Logger.LogError("This is the next part of the script!");
+            }
+           
         }
 
         [HarmonyPatch(typeof(PlayerControllerB))]
