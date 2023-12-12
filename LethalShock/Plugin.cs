@@ -31,6 +31,7 @@ namespace LethalShock
         private static ConfigEntry<string> Username;
         private static ConfigEntry<string> ApiKey;
         private static ConfigEntry<string> Code;
+        private static ConfigEntry<string> ShockProvider;
 
         internal static new ConfigFile Config { get; set; }
         public new static BepInEx.Logging.ManualLogSource Logger { get; private set; }
@@ -48,6 +49,7 @@ namespace LethalShock
             Username = Config.Bind<string>("Settings", "Username", "JohnDoe", "Your username");
             ApiKey = Config.Bind<string>("Settings", "ApiKey", "5c678926-d19e-4f86-42ad-21f5a76126db", "Your API key");
             Code = Config.Bind<string>("Settings", "Code", "17519CD8GAP", "Your share code");
+            ShockProvider = Config.Bind<string>("Settings", "ShockProvider", "PiShock", "OPTIONS: PiShock | OpenShock");
 
             ShockerMode = 0; // 0 is Shock, 1 is Vibrate, 2 is Beep
             Intensity = 100; // Placeholder numbers, Has to be between 1 and 100
@@ -129,7 +131,7 @@ namespace LethalShock
 
                     storedDamageNumber = damageNumber;
 
-                    Logger.LogInfo($"Lol is this our script? {damageNumber} damage: {currentHealth}");
+                    Logger.LogInfo($"{damageNumber} damage: {currentHealth}");
 
                     Logger.LogInfo($"Health Difference: {damageNumber}");
 
@@ -154,11 +156,15 @@ namespace LethalShock
             [HarmonyPatch("KillPlayer")]
             static void KillPlayerPostFix(PlayerControllerB __instance)
             {
-                if(storedDamageNumber != 0 )
+                if(storedDamageNumber != 0 || Instance.previousHealth == -1)
                 {
                     Logger.LogError("Cannot double shock for user safety!");
                 }
-                else
+                if (storedDamageNumber != 0)
+                {
+                    Logger.LogError("Cannot double shock for user safety!");
+                }
+                /*else
                 {
                     Logger.LogInfo("Player Killed by Unkown Cause!");
                     Instance.CallApiAsync(100, 1, 0); // Uncomment when ready to call the API
@@ -169,7 +175,7 @@ namespace LethalShock
                     Logger.LogInfo("Player Killed by Unkown Cause!");
                     Instance.CallApiAsync(100, 1, 0); // Uncomment when ready to call the API
                     Logger.LogInfo($"Player Zapped with no mercy, player was killed");
-                }
+                }*/
             }
 
             static bool IsPlayerValid(PlayerControllerB player)
