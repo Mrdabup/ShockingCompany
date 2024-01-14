@@ -28,10 +28,11 @@ namespace LethalShock
         public int ShockerMode;
         public int Intensity;
         public int Duration;
+        private static ConfigEntry<string> ShockProvider;
         private static ConfigEntry<string> Username;
         private static ConfigEntry<string> ApiKey;
         private static ConfigEntry<string> Code;
-        private static ConfigEntry<string> ShockProvider;
+        private static ConfigEntry<string> ID;
 
         internal static new ConfigFile Config { get; set; }
         public new static BepInEx.Logging.ManualLogSource Logger { get; private set; }
@@ -46,12 +47,13 @@ namespace LethalShock
             }
 
             Config = new ConfigFile(Paths.ConfigPath + "\\ShockingCompany.cfg", true);
+            ShockProvider = Config.Bind<string>("Settings", "ShockProvider", "PiShock", "OPTIONS: PiShock | OpenShock");
             Username = Config.Bind<string>("Settings", "Username", "JohnDoe", "Your username");
             ApiKey = Config.Bind<string>("Settings", "ApiKey", "5c678926-d19e-4f86-42ad-21f5a76126db", "Your API key");
             Code = Config.Bind<string>("Settings", "Code", "17519CD8GAP", "Your share code");
-            ShockProvider = Config.Bind<string>("Settings", "ShockProvider", "PiShock", "OPTIONS: PiShock | OpenShock");
+            ID = Config.Bind<string>("Settings", "ID", "3fa85f64-5717-4562-b3fc-2c963f66afa6", "The ID for the shocker (OpenShock)");
 
-            ShockerMode = 0; // 0 is Shock, 1 is Vibrate, 2 is Beep
+            ShockerMode = 0; // 0 is Shock, 1 is Vibrate, 2 is Beep (Unkown what those numbers are for OpenShock)
             Intensity = 100; // Placeholder numbers, Has to be between 1 and 100
             Duration = 5; // Placeholder numbers, Has to be between 1 and 15
 
@@ -68,7 +70,14 @@ namespace LethalShock
 
             Logger.LogInfo(Username.Value);
 
-            await CallApiAsync(100, 3, 2); //Goes like this: Intensity, Duration, ShockerMode
+            if (ShockProvider.Value == "PiShock")
+            {
+                await CallPiAsync(100, 3, 2); //Goes like this: Intensity, Duration, ShockerMode
+            }
+            else
+            {
+                await CallOpenAsync(2, 10, 2); //Goes like this: ShockerMode, Intensity, Duration
+            }
 
             Logger.LogInfo("Please check if it beeped, if not and there is an error check config files.");
         }
@@ -117,12 +126,12 @@ namespace LethalShock
                 }
             }
         }
-        private async Task CallApiAsync(int intensity, int duration, int mode)
+        private async Task CallOpenAsync(int intensity, int duration, int mode)
         {
             using (HttpClient client = new HttpClient())
             {
                 string jsonPayload =
-                    $"{{\"id\":\"{Username.Value}\",\"type\":\"{Name}\",\"intensity\":\"{Code.Value}\",\"duration\":\"{intensity}\"}}";
+                    $"{{\"id\":\"{ID.Value}\",\"type\":\"{mode}\",\"intensity\":\"{intensity}\",\"duration\":\"{duration}\"}}";
                 StringContent content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
                 try
@@ -168,6 +177,8 @@ namespace LethalShock
                     {
                         Instance.Intensity = damageNumber;
 
+                    if (ShockProvider.Value == "PiShock")
+                    {
                         try
                         {
                             Instance.CallPiAsync(damageNumber, 1, 0); // Uncomment when ready to call the API
@@ -175,8 +186,21 @@ namespace LethalShock
                         }
                         catch (Exception ex)
                         {
-                            Logger.LogInfo($"Error in CallApiAsync: {ex.Message}");
+                            Logger.LogInfo($"Error in CallPiAsync: {ex.Message}");
                         }
+                    }
+                    else
+                    {
+                        try
+                        {
+                            Instance.CallPiAsync(0, damageNumber, 1); // Uncomment when ready to call the API
+                            Logger.LogInfo($"Player Zapped with value {damageNumber}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.LogInfo($"Error in CallOpenAsync: {ex.Message}");
+                        }
+                    }
                     }
                 Instance.previousHealth = currentHealth; // Update previous health for the instance
             }
