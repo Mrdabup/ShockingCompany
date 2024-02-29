@@ -1,3 +1,6 @@
+# Notice!
+As of February 29th of the year 2024, this project has been discontinued.
+
 # ShockingCompany
 A FOSS project to add PiShock support to Lethal Company
 
